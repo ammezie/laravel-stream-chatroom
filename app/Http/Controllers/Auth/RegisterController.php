@@ -79,13 +79,21 @@ class RegisterController extends Controller
      */
     protected function registered($user)
     {
-        // create the user on Stream Chat
-        $client = new StreamClient(env("MIX_STREAM_API_KEY"), env("MIX_STREAM_API_SECRET"), $timeout = 9000);
+        $client = new StreamClient(env("MIX_STREAM_API_KEY"), env("MIX_STREAM_API_SECRET"), null, null, 9);
 
+        // create the user on Stream Chat
         $client->updateUser([
             'id' => explode('@', $user->email)[0],
             'name' => $user->name,
-            'role' => 'admin' // this is a hack to resolve permissions issue on channel
         ]);
+
+        // create channel
+        $channel = $client->Channel("messaging", "chatroomm");
+
+        // channel is created by `admin` user
+        $channel->create('admin');
+
+        // then add the newly registered user as a member
+        $channel->addMembers([explode('@', $user->email)[0]]);
     }
 }

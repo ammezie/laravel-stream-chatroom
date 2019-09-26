@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f91589cd6943282b74fd8faa884eaff",
+    "content-hash": "af90487ca156a8e705af8d6121b821c5",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -428,16 +428,16 @@
         },
         {
             "name": "get-stream/stream-chat",
-            "version": "1.0.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GetStream/stream-chat-php.git",
-                "reference": "3836b30c67d80a4afeb31c2fc6843f1c09a7382e"
+                "reference": "b7c65800a1b58f62f511df20018332bbc6f62c31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GetStream/stream-chat-php/zipball/3836b30c67d80a4afeb31c2fc6843f1c09a7382e",
-                "reference": "3836b30c67d80a4afeb31c2fc6843f1c09a7382e",
+                "url": "https://api.github.com/repos/GetStream/stream-chat-php/zipball/b7c65800a1b58f62f511df20018332bbc6f62c31",
+                "reference": "b7c65800a1b58f62f511df20018332bbc6f62c31",
                 "shasum": ""
             },
             "require": {
@@ -474,7 +474,7 @@
                 "chat-sdk",
                 "stream"
             ],
-            "time": "2019-06-24T23:47:07+00:00"
+            "time": "2019-09-26T18:51:58+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

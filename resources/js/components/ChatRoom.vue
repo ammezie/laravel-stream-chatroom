@@ -11,7 +11,7 @@
               v-for="(member, id) in channelMembers"
               :key="id"
             >
-              <li class="list-group-item">{{ member.name }}</li>
+              <li class="list-group-item">{{ member.user.name }}</li>
             </ul>
           </div>
         </div>
@@ -84,6 +84,11 @@ export default {
     await this.initializeStream();
     await this.initializeChannel();
 
+    const state = await this.channel.watch({
+      presence: true,
+      user_id: this.username
+    });
+
     // listen for new messages
     this.channel.on("message.new", event => {
       this.messages.push({
@@ -92,13 +97,24 @@ export default {
       });
     });
 
-    // const channels = await this.client.queryChannels(
-    //   { type: "messaging" },
-    //   { last_message_at: -1 },
-    //   { presence: true }
-    // );
+    // listen for new channel member
+    this.channel.on("member.added", event => {
+      console.log(event);
+      this.channelMembers.push(event);
+    });
 
-    // console.log(channels);
+    this.channel.on("user.presence.changed", event => {
+      // event.user.online
+      console.log(event);
+    });
+
+    this.messages = state.messages;
+
+    this.channelMembers = state.members.filter(member => {
+      return member.user.online === true;
+    });
+
+    // console.log(this.channelMembers[0].user);
   },
   methods: {
     async getToken() {
@@ -119,20 +135,9 @@ export default {
       );
     },
     async initializeChannel() {
-      this.channel = this.client.channel("messaging", "chatroom", {
-        name: "Laravel Chatroom"
-      });
+      this.channel = this.client.channel("messaging", "chatroomm");
 
       //   this.messages = (await this.channel.watch()).messages;
-      const state = await this.channel.watch();
-
-      this.messages = state.messages;
-
-      this.channelMembers = state.members.filter(member => {
-        return member.online === true;
-      });
-
-      console.log(state);
     },
     async sendMessage() {
       await this.channel.sendMessage({

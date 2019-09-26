@@ -2339,6 +2339,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
       var _this = this;
 
+      var state;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -2355,20 +2356,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return this.initializeChannel();
 
             case 6:
+              _context.next = 8;
+              return this.channel.watch({
+                presence: true,
+                user_id: this.username
+              });
+
+            case 8:
+              state = _context.sent;
               // listen for new messages
               this.channel.on("message.new", function (event) {
                 _this.messages.push({
                   text: event.message.text,
                   user: event.message.user
                 });
-              }); // const channels = await this.client.queryChannels(
-              //   { type: "messaging" },
-              //   { last_message_at: -1 },
-              //   { presence: true }
-              // );
-              // console.log(channels);
+              }); // listen for new channel member
 
-            case 7:
+              this.channel.on("member.added", function (event) {
+                console.log(event);
+
+                _this.channelMembers.push(event);
+              });
+              this.channel.on("user.presence.changed", function (event) {
+                // event.user.online
+                console.log(event);
+              });
+              this.messages = state.messages;
+              this.channelMembers = state.members.filter(function (member) {
+                return member.user.online === true;
+              }); // console.log(this.channelMembers[0].user);
+
+            case 14:
             case "end":
               return _context.stop();
           }
@@ -2452,27 +2470,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _initializeChannel = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
-        var state;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                this.channel = this.client.channel("messaging", "chatroom", {
-                  name: "Laravel Chatroom"
-                }); //   this.messages = (await this.channel.watch()).messages;
+                this.channel = this.client.channel("messaging", "chatroomm"); //   this.messages = (await this.channel.watch()).messages;
 
-                _context4.next = 3;
-                return this.channel.watch();
-
-              case 3:
-                state = _context4.sent;
-                this.messages = state.messages;
-                this.channelMembers = state.members.filter(function (member) {
-                  return member.online === true;
-                });
-                console.log(state);
-
-              case 7:
+              case 1:
               case "end":
                 return _context4.stop();
             }
@@ -49505,7 +49509,7 @@ var render = function() {
                 { key: id, staticClass: "list-group list-group-flush" },
                 [
                   _c("li", { staticClass: "list-group-item" }, [
-                    _vm._v(_vm._s(member.name))
+                    _vm._v(_vm._s(member.user.name))
                   ])
                 ]
               )
