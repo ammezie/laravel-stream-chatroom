@@ -2474,7 +2474,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                this.channel = this.client.channel("messaging", "chatroomm"); //   this.messages = (await this.channel.watch()).messages;
+                this.channel = this.client.channel("messaging", "chatroom"); //   this.messages = (await this.channel.watch()).messages;
 
               case 1:
               case "end":

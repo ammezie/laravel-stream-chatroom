@@ -135,7 +135,7 @@ export default {
       );
     },
     async initializeChannel() {
-      this.channel = this.client.channel("messaging", "chatroomm");
+      this.channel = this.client.channel("messaging", "chatroom");
 
       //   this.messages = (await this.channel.watch()).messages;
     },

@@ -81,19 +81,21 @@ class RegisterController extends Controller
     {
         $client = new StreamClient(env("MIX_STREAM_API_KEY"), env("MIX_STREAM_API_SECRET"), null, null, 9);
 
+        $username = explode('@', $user->email)[0];
+
         // create the user on Stream Chat
         $client->updateUser([
-            'id' => explode('@', $user->email)[0],
+            'id' => $username,
             'name' => $user->name,
         ]);
 
         // create channel
-        $channel = $client->Channel("messaging", "chatroomm");
+        $channel = $client->Channel("messaging", "chatroom");
 
         // channel is created by `admin` user
         $channel->create('admin');
 
         // then add the newly registered user as a member
-        $channel->addMembers([explode('@', $user->email)[0]]);
+        $channel->addMembers([$username]);
     }
 }
