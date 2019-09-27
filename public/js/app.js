@@ -2322,7 +2322,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       token: null,
       channel: null,
-      channelMembers: [],
+      members: [],
       client: null,
       messages: [],
       newMessage: ""
@@ -2337,9 +2337,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _created = _asyncToGenerator(
     /*#__PURE__*/
     _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var _this = this;
-
-      var state;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -2356,37 +2353,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return this.initializeChannel();
 
             case 6:
-              _context.next = 8;
-              return this.channel.watch({
-                presence: true,
-                user_id: this.username
-              });
-
-            case 8:
-              state = _context.sent;
-              // listen for new messages
-              this.channel.on("message.new", function (event) {
-                _this.messages.push({
-                  text: event.message.text,
-                  user: event.message.user
-                });
-              }); // listen for new channel member
-
-              this.channel.on("member.added", function (event) {
-                console.log(event);
-
-                _this.channelMembers.push(event);
-              });
-              this.channel.on("user.presence.changed", function (event) {
-                // event.user.online
-                console.log(event);
-              });
-              this.messages = state.messages;
-              this.channelMembers = state.members.filter(function (member) {
-                return member.user.online === true;
-              }); // console.log(this.channelMembers[0].user);
-
-            case 14:
             case "end":
               return _context.stop();
           }
@@ -2470,13 +2436,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _initializeChannel = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
+        var _this = this;
+
+        var _ref2, members, messages;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                this.channel = this.client.channel("messaging", "chatroom"); //   this.messages = (await this.channel.watch()).messages;
+                this.channel = this.client.channel("messaging", "chatroom");
+                _context4.next = 3;
+                return this.channel.watch();
 
-              case 1:
+              case 3:
+                _ref2 = _context4.sent;
+                members = _ref2.members;
+                messages = _ref2.messages;
+                this.members = members;
+                this.messages = messages; // listen for new messages
+
+                this.channel.on("message.new", function (event) {
+                  _this.messages.push({
+                    text: event.message.text,
+                    user: event.message.user
+                  });
+                }); // listen for when a new member is added to channel
+
+                this.channel.on("member.added", function (event) {
+                  _this.members.push(event);
+                });
+
+              case 10:
               case "end":
                 return _context4.stop();
             }
@@ -49498,24 +49488,20 @@ var render = function() {
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-md-3" }, [
         _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-header" }, [_vm._v("Online Users")]),
+          _c("div", { staticClass: "card-header" }, [_vm._v("Members")]),
           _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "card-body" },
-            _vm._l(_vm.channelMembers, function(member, id) {
-              return _c(
-                "ul",
-                { key: id, staticClass: "list-group list-group-flush" },
-                [
-                  _c("li", { staticClass: "list-group-item" }, [
-                    _vm._v(_vm._s(member.user.name))
-                  ])
-                ]
-              )
-            }),
-            0
-          )
+          _c("div", { staticClass: "card-body" }, [
+            _c(
+              "ul",
+              { staticClass: "list-group list-group-flush" },
+              _vm._l(_vm.members, function(member, id) {
+                return _c("li", { key: id, staticClass: "list-group-item" }, [
+                  _vm._v(_vm._s(member.user.name))
+                ])
+              }),
+              0
+            )
+          ])
         ])
       ]),
       _vm._v(" "),

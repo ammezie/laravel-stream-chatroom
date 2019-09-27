@@ -3,15 +3,15 @@
     <div class="row">
       <div class="col-md-3">
         <div class="card">
-          <div class="card-header">Online Users</div>
+          <div class="card-header">Members</div>
 
           <div class="card-body">
-            <ul
-              class="list-group list-group-flush"
-              v-for="(member, id) in channelMembers"
-              :key="id"
-            >
-              <li class="list-group-item">{{ member.user.name }}</li>
+            <ul class="list-group list-group-flush">
+              <li
+                class="list-group-item"
+                v-for="(member, id) in members"
+                :key="id"
+              >{{ member.user.name }}</li>
             </ul>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default {
     return {
       token: null,
       channel: null,
-      channelMembers: [],
+      members: [],
       client: null,
       messages: [],
       newMessage: ""
@@ -83,38 +83,6 @@ export default {
 
     await this.initializeStream();
     await this.initializeChannel();
-
-    const state = await this.channel.watch({
-      presence: true,
-      user_id: this.username
-    });
-
-    // listen for new messages
-    this.channel.on("message.new", event => {
-      this.messages.push({
-        text: event.message.text,
-        user: event.message.user
-      });
-    });
-
-    // listen for new channel member
-    this.channel.on("member.added", event => {
-      console.log(event);
-      this.channelMembers.push(event);
-    });
-
-    this.channel.on("user.presence.changed", event => {
-      // event.user.online
-      console.log(event);
-    });
-
-    this.messages = state.messages;
-
-    this.channelMembers = state.members.filter(member => {
-      return member.user.online === true;
-    });
-
-    // console.log(this.channelMembers[0].user);
   },
   methods: {
     async getToken() {
@@ -137,7 +105,24 @@ export default {
     async initializeChannel() {
       this.channel = this.client.channel("messaging", "chatroom");
 
-      //   this.messages = (await this.channel.watch()).messages;
+      const { members, messages } = await this.channel.watch();
+
+      this.members = members;
+
+      this.messages = messages;
+
+      // listen for new messages
+      this.channel.on("message.new", event => {
+        this.messages.push({
+          text: event.message.text,
+          user: event.message.user
+        });
+      });
+
+      // listen for when a new member is added to channel
+      this.channel.on("member.added", event => {
+        this.members.push(event);
+      });
     },
     async sendMessage() {
       await this.channel.sendMessage({
