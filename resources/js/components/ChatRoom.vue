@@ -13,6 +13,8 @@
                 :key="id"
               >{{ member.user.name }}</li>
             </ul>
+
+            <button type="button" class="mt-4 btn btn-primary" @click="leaveChannel">Leave Channel</button>
           </div>
         </div>
       </div>
@@ -29,6 +31,8 @@
 
             <hr />
 
+            <span class="help-block" v-if="status" v-text="status" style="font-style: italic;"></span>
+
             <form @submit.prevent="sendMessage" method="post">
               <div class="input-group">
                 <input
@@ -36,6 +40,8 @@
                   v-model="newMessage"
                   class="form-control"
                   placeholder="Type your message..."
+                  @keydown="startedTyping"
+                  @keyup="stoppedTyping"
                 />
 
                 <div class="input-group-append">
@@ -43,6 +49,12 @@
                 </div>
               </div>
             </form>
+
+            <span
+              class="help-block mt-2"
+              v-if="isTyping && typing.user.id !== username"
+              style="font-style: italic;"
+            >{{ `${typing.user.name} is typing...` }}</span>
           </div>
         </div>
       </div>
@@ -69,7 +81,10 @@ export default {
       members: [],
       client: null,
       messages: [],
-      newMessage: ""
+      newMessage: "",
+      status: "",
+      isTyping: false,
+      typing: null
     };
   },
   computed: {
@@ -122,6 +137,23 @@ export default {
       // listen for when a new member is added to channel
       this.channel.on("member.added", event => {
         this.members.push(event);
+
+        this.status = `${event.user.name} joined the chat`;
+      });
+
+      // listen for when a member leaves channel
+      this.channel.on("member.removed", event => {
+        this.status = `${event.user.name} just left the chat`;
+      });
+
+      // listen for typing...
+      this.channel.on("typing.start", event => {
+        this.isTyping = true;
+        this.typing = event;
+      });
+
+      this.channel.on("typing.stop", event => {
+        this.isTyping = false;
       });
     },
     async sendMessage() {
@@ -130,6 +162,21 @@ export default {
       });
 
       this.newMessage = "";
+    },
+    leaveChannel() {
+      axios.post("/api/leave-channel", {
+        username: this.username
+      });
+
+      window.location.href = "/dashboard";
+    },
+    async startedTyping() {
+      await this.channel.keystroke();
+    },
+    stoppedTyping() {
+      setTimeout(async () => {
+        await this.channel.stopTyping();
+      }, 2000);
     }
   }
 };

@@ -7,15 +7,38 @@ use GetStream\StreamChat\Client as StreamClient;
 
 class ChatController extends Controller
 {
+    protected $client;
+    protected $channel;
+
+    public function __construct()
+    {
+        $this->client = new StreamClient(env("MIX_STREAM_API_KEY"), env("MIX_STREAM_API_SECRET"), null, null, 9);
+        $this->channel = $this->client->Channel("messaging", "chatroom");
+    }
+
     /**
      * Generate token for clientside use
      */
     public function generateToken(Request $request)
     {
-        $client = new StreamClient(env("MIX_STREAM_API_KEY"), env("MIX_STREAM_API_SECRET"), null, null, 9);
-
         return response()->json([
-            'token' => $client->createToken($request->user_id)
+            'token' => $this->client->createToken($request->user_id)
         ]);
+    }
+
+    public function leaveChannel(Request $request)
+    {
+        $this->channel->removeMembers([$request->username]);
+
+        return redirect('/dashboard');
+    }
+
+    public function joinChannel(Request $request)
+    {
+        $username = explode('@', $request->user()->email)[0];
+
+        $this->channel->addMembers([$username]);
+
+        return redirect('/home');
     }
 }

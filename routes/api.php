@@ -14,3 +14,5 @@ use Illuminate\Http\Request;
 */
 
 Route::post('/generate-token', 'ChatController@generateToken');
+Route::post('/leave-channel', 'ChatController@leaveChannel');
+Route::post('/join-channel', 'ChatController@joinChannel')->name('join-channel');

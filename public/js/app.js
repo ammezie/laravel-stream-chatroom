@@ -2308,6 +2308,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2325,7 +2337,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       members: [],
       client: null,
       messages: [],
-      newMessage: ""
+      newMessage: "",
+      status: "",
+      isTyping: false,
+      typing: null
     };
   },
   computed: {
@@ -2409,7 +2424,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                this.client = new stream_chat__WEBPACK_IMPORTED_MODULE_2__["StreamChat"]("24hamuny2bj7", {
+                this.client = new stream_chat__WEBPACK_IMPORTED_MODULE_2__["StreamChat"]("rxq755tzdvy4", {
                   timeout: 9000
                 });
                 _context3.next = 3;
@@ -2464,9 +2479,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 this.channel.on("member.added", function (event) {
                   _this.members.push(event);
+
+                  _this.status = "".concat(event.user.name, " joined the chat");
+                }); // listen for when a member leaves channel
+
+                this.channel.on("member.removed", function (event) {
+                  _this.status = "".concat(event.user.name, " just left the chat");
+                }); // listen for typing...
+
+                this.channel.on("typing.start", function (event) {
+                  _this.isTyping = true;
+                  _this.typing = event;
+                });
+                this.channel.on("typing.stop", function (event) {
+                  _this.isTyping = false;
                 });
 
-              case 10:
+              case 13:
               case "end":
                 return _context4.stop();
             }
@@ -2509,7 +2538,61 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       return sendMessage;
-    }()
+    }(),
+    leaveChannel: function leaveChannel() {
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("/api/leave-channel", {
+        username: this.username
+      });
+      window.location.href = "/dashboard";
+    },
+    startedTyping: function () {
+      var _startedTyping = _asyncToGenerator(
+      /*#__PURE__*/
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this.channel.keystroke();
+
+              case 2:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function startedTyping() {
+        return _startedTyping.apply(this, arguments);
+      }
+
+      return startedTyping;
+    }(),
+    stoppedTyping: function stoppedTyping() {
+      var _this2 = this;
+
+      setTimeout(
+      /*#__PURE__*/
+      _asyncToGenerator(
+      /*#__PURE__*/
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return _this2.channel.stopTyping();
+
+              case 2:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7);
+      })), 2000);
+    }
   }
 });
 
@@ -49500,6 +49583,16 @@ var render = function() {
                 ])
               }),
               0
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "mt-4 btn btn-primary",
+                attrs: { type: "button" },
+                on: { click: _vm.leaveChannel }
+              },
+              [_vm._v("Leave Channel")]
             )
           ])
         ])
@@ -49535,6 +49628,14 @@ var render = function() {
               _vm._v(" "),
               _c("hr"),
               _vm._v(" "),
+              _vm.status
+                ? _c("span", {
+                    staticClass: "help-block",
+                    staticStyle: { "font-style": "italic" },
+                    domProps: { textContent: _vm._s(_vm.status) }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
               _c(
                 "form",
                 {
@@ -49564,6 +49665,8 @@ var render = function() {
                       },
                       domProps: { value: _vm.newMessage },
                       on: {
+                        keydown: _vm.startedTyping,
+                        keyup: _vm.stoppedTyping,
                         input: function($event) {
                           if ($event.target.composing) {
                             return
@@ -49576,7 +49679,18 @@ var render = function() {
                     _vm._m(0)
                   ])
                 ]
-              )
+              ),
+              _vm._v(" "),
+              _vm.isTyping && _vm.typing.user.id !== _vm.username
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "help-block mt-2",
+                      staticStyle: { "font-style": "italic" }
+                    },
+                    [_vm._v(_vm._s(_vm.typing.user.name + " is typing..."))]
+                  )
+                : _vm._e()
             ],
             2
           )
