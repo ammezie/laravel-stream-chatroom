@@ -28,14 +28,12 @@ class ChatController extends Controller
 
     public function leaveChannel(Request $request)
     {
-        $this->channel->removeMembers([$request->username]);
-
-        return redirect('/dashboard');
+        return $this->channel->removeMembers([$request->username]);
     }
 
     public function joinChannel(Request $request)
     {
-        $username = explode('@', $request->user()->email)[0];
+        $username = explode('@', $request->email)[0];
 
         $this->channel->addMembers([$username]);
 

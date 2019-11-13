@@ -11,6 +11,7 @@
                         <p>You have left the channel!</p>
 
                         <form action="{{ route('join-channel') }}" method="post">
+                            <input type="hidden" name="email" value="{{ Auth::user()->email }}">
                           <button type="submit" class="btn btn-primary">Join Channel</button>
                         </form>
                     </div>

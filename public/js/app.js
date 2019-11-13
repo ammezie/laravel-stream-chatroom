@@ -2484,6 +2484,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }); // listen for when a member leaves channel
 
                 this.channel.on("member.removed", function (event) {
+                  _this.members = _this.members.filter(function (member) {
+                    return member.user.id !== event.user.id;
+                  });
                   _this.status = "".concat(event.user.name, " just left the chat");
                 }); // listen for typing...
 

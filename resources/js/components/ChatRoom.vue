@@ -143,6 +143,10 @@ export default {
 
       // listen for when a member leaves channel
       this.channel.on("member.removed", event => {
+        this.members = this.members.filter(member => {
+          return member.user.id !== event.user.id;
+        });
+
         this.status = `${event.user.name} just left the chat`;
       });
 
