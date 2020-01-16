@@ -1,5 +1,5 @@
 <div>
-    Hi, This is : {{ $name }},
+    <p>Hi, This is : {{ $name }},</p>
 
-    A new message has been sent on the group chat
+    <p>A new message has been sent on the chatroom.</p>
 </div>
